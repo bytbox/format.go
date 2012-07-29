@@ -14,6 +14,7 @@ var tests_ParseFormat []test_ParseFormat = []test_ParseFormat{
 	{`a`, Format{rawPart{`a`}}},
 	{`abc`, Format{rawPart{`abc`}}},
 	{`a$$b`, Format{rawPart{`a$b`}}},
+	{`${a}`, Format{fieldPart{`a`}}},
 }
 
 func TestParseFormat(t *testing.T) {

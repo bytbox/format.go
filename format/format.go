@@ -96,8 +96,10 @@ raw:
 		if r != '{' {
 			return nil, errors.New("Invalid character sequence: $" + string(r))
 		}
-		fmt = append(fmt, rawPart{buf})
-		buf = ""
+		if len(buf) > 0 {
+			fmt = append(fmt, rawPart{buf})
+			buf = ""
+		}
 		goto field
 	}
 	buf += string(r)
