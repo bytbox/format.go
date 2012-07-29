@@ -117,7 +117,7 @@ field:
 	goto field
 
 done:
-	return nil, nil
+	return fmt, nil
 }
 
 // See ParseFormat for a description of the format string.

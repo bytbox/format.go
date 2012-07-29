@@ -1,6 +1,7 @@
 package format
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -9,11 +10,22 @@ type test_ParseFormat struct {
 	format       Format
 }
 
-var tests_ParseFormat []test_ParseFormat = []test_ParseFormat{}
+var tests_ParseFormat []test_ParseFormat = []test_ParseFormat{
+	{`a`, Format{rawPart{`a`}}},
+	{`abc`, Format{rawPart{`abc`}}},
+	{`a$$b`, Format{rawPart{`a$b`}}},
+}
 
 func TestParseFormat(t *testing.T) {
 	for _, test := range tests_ParseFormat {
-		println(test.formatString)
+		fmt, err := ParseFormat(test.formatString)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err.Error())
+		}
+		if !reflect.DeepEqual(fmt, test.format) {
+			t.Errorf("`%s`: expected %v - got %v",
+				test.formatString, test.format, fmt)
+		}
 	}
 }
 
