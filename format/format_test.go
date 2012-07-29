@@ -37,6 +37,8 @@ func BenchParseFormat(b *testing.B) {
 
 type test_Write struct {
 	formatString string
+	data         interface{}
+	result       string
 }
 
 var tests_Write []test_Write = []test_Write{}
@@ -46,6 +48,12 @@ func TestWrite(t *testing.T) {
 		println(test.formatString)
 	}
 }
+
+type test_Read struct {
+	formatString string
+}
+
+var tests_Read []test_Read = []test_Read{}
 
 func TestRead(t *testing.T) {
 

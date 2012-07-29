@@ -21,7 +21,9 @@ func (rp rawPart) Write(data interface{}) (string, error) {
 }
 
 func (rp rawPart) Read(input string, data interface{}) error {
-	// TODO
+	if input[:len(rp.data)] != rp.data {
+		return errors.New("Read failed (expected raw data not found)")
+	}
 	return nil
 }
 
