@@ -31,6 +31,10 @@ func TestParseFormat(t *testing.T) {
 	}
 }
 
+func BenchParseFormat(b *testing.B) {
+
+}
+
 type test_Write struct {
 	formatString string
 }
