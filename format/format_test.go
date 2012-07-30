@@ -35,17 +35,33 @@ func BenchParseFormat(b *testing.B) {
 
 }
 
+type testRecord struct {
+	a string
+	b string
+}
+
 type test_Write struct {
 	formatString string
 	data         interface{}
 	result       string
 }
 
-var tests_Write []test_Write = []test_Write{}
+var tests_Write []test_Write = []test_Write{
+	{``, nil, ``},
+	{`ab`, nil, `ab`},
+	{`a${b}b${a}`, testRecord{"x", "yz"}, `ayzbx`},
+}
 
 func TestWrite(t *testing.T) {
 	for _, test := range tests_Write {
-		println(test.formatString)
+		r, err := Write(test.formatString, test.data)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err.Error())
+		}
+		if r != test.result {
+			t.Errorf("`%s`: expected `%s` - got `%s`",
+				test.formatString, test.result, r)
+		}
 	}
 }
 

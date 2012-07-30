@@ -2,6 +2,7 @@ package format
 
 import (
 	"errors"
+	"reflect"
 )
 
 // Size of the channel buffer (in runes) used in parsing format strings.
@@ -32,8 +33,8 @@ type fieldPart struct {
 }
 
 func (fp fieldPart) Write(data interface{}) (string, error) {
-	// TODO
-	return "", nil
+	dv := reflect.ValueOf(data)
+	return dv.FieldByName(fp.name).String(), nil
 }
 
 func (fp fieldPart) Read(input string, data interface{}) error {
