@@ -67,10 +67,24 @@ func TestWrite(t *testing.T) {
 
 type test_Read struct {
 	formatString string
+	input        string
+	data         interface{}
 }
 
-var tests_Read []test_Read = []test_Read{}
+var tests_Read []test_Read = []test_Read{
+	{`ab`, `ab`, testRecord{}},
+}
 
 func TestRead(t *testing.T) {
-
+	for _, test := range tests_Read {
+		result := testRecord{}
+		err := Read(test.formatString, test.input, &result)
+		if err != nil {
+			t.Errorf("Unexpected error: %s", err.Error())
+		}
+		if !reflect.DeepEqual(test.data, result) {
+			t.Errorf("`%s`, `%s`: expected %v - got %v",
+				test.formatString, test.input, test.data, result)
+		}
+	}
 }
