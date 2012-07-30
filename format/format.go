@@ -14,7 +14,7 @@ type FormatPart interface {
 	// Match returns true if this FormatPart can be applied to the
 	// beginning of the given string without error.
 	Match(string) bool
-	Read(string, interface{}, FormatPart) error
+	Read(string, interface{}, FormatPart) (string, error)
 }
 
 type rawPart struct {
@@ -29,11 +29,11 @@ func (rp rawPart) Match(input string) bool {
 	return input[:len(rp.data)] == rp.data
 }
 
-func (rp rawPart) Read(input string, data interface{}, next FormatPart) error {
+func (rp rawPart) Read(input string, data interface{}, next FormatPart) (string, error) {
 	if input[:len(rp.data)] != rp.data {
-		return errors.New("Read failed (expected raw data not found)")
+		return "", errors.New("Read failed (expected raw data not found)")
 	}
-	return nil
+	return input[len(rp.data):], nil
 }
 
 type fieldPart struct {
@@ -49,16 +49,33 @@ func (fp fieldPart) Match(input string) bool {
 	return true
 }
 
-func (fp fieldPart) Read(input string, data interface{}, next FormatPart) error {
+func (fp fieldPart) Read(input string, data interface{}, next FormatPart) (string, error) {
 	var i int
 	for i = 0; i < len(input); i++ {
 		if next.Match(input[i:]) {
 			break
 		}
 	}
-	dv := reflect.ValueOf(fp.name)
-	dv.SetString(input[:i])
-	return nil
+	dv := reflect.Indirect(reflect.ValueOf(data))
+	dv.FieldByName(fp.name).SetString(input[:i])
+	return input[i:], nil
+}
+
+type terminalPart struct{}
+
+func (tp terminalPart) Write(data interface{}) (string, error) {
+	return "", nil
+}
+
+func (tp terminalPart) Match(input string) bool {
+	return len(input) == 0
+}
+
+func (tp terminalPart) Read(input string, data interface{}, next FormatPart) (string, error) {
+	if len(input) > 0 {
+		return "", errors.New("unexpected data at end of string")
+	}
+	return "", nil
 }
 
 // A Format describes a particular way of representing a record as a string.
@@ -77,6 +94,19 @@ func (fmt Format) Write(data interface{}) (string, error) {
 }
 
 func (fmt Format) Read(input string, data interface{}) error {
+	for i := 0; i < len(fmt); i++ {
+		var np FormatPart
+		if i+1 == len(fmt) {
+			np = terminalPart{}
+		} else {
+			np = fmt[i+1]
+		}
+		s, err := fmt[i].Read(input, data, np)
+		if err != nil {
+			return err
+		}
+		input = s
+	}
 	return nil
 }
 

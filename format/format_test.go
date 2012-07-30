@@ -36,8 +36,8 @@ func BenchParseFormat(b *testing.B) {
 }
 
 type testRecord struct {
-	a string
-	b string
+	A string
+	B string
 }
 
 type test_Write struct {
@@ -49,7 +49,7 @@ type test_Write struct {
 var tests_Write []test_Write = []test_Write{
 	{``, nil, ``},
 	{`ab`, nil, `ab`},
-	{`a${b}b${a}`, testRecord{"x", "yz"}, `ayzbx`},
+	{`a${B}b${A}`, testRecord{"x", "yz"}, `ayzbx`},
 }
 
 func TestWrite(t *testing.T) {
@@ -73,6 +73,9 @@ type test_Read struct {
 
 var tests_Read []test_Read = []test_Read{
 	{`ab`, `ab`, testRecord{}},
+	{`ab${A}`, `abc`, testRecord{`c`, ``}},
+	{`ab${A}c`, `abc`, testRecord{``, ``}},
+	{`a${A}c`, `abc`, testRecord{`b`, ``}},
 }
 
 func TestRead(t *testing.T) {
