@@ -42,7 +42,13 @@ type fieldPart struct {
 
 func (fp fieldPart) Write(data interface{}) (string, error) {
 	dv := reflect.ValueOf(data)
-	return dv.FieldByName(fp.name).String(), nil
+	switch dv.Type().Kind() {
+	case reflect.Struct:
+		return dv.FieldByName(fp.name).String(), nil
+	case reflect.Map:
+		return dv.MapIndex(reflect.ValueOf(fp.name)).String(), nil
+	}
+	panic("unknown type passed to Write()")
 }
 
 func (fp fieldPart) Match(input string) bool {

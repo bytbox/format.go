@@ -50,6 +50,7 @@ var tests_Write []test_Write = []test_Write{
 	{``, nil, ``},
 	{`ab`, nil, `ab`},
 	{`a${B}b${A}`, testRecord{"x", "yz"}, `ayzbx`},
+	{`a${B}b${A}`, map[string]string{"A": "x", "B": "yz"}, `ayzbx`},
 }
 
 func TestWrite(t *testing.T) {
