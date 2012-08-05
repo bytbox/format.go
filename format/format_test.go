@@ -78,6 +78,7 @@ var tests_Read []test_Read = []test_Read{
 	{`ab${A}`, `abc`, new(testRecord), &testRecord{`c`, ``}},
 	{`ab${A}c`, `abc`, new(testRecord), &testRecord{``, ``}},
 	{`a${A}c`, `abc`, new(testRecord), &testRecord{`b`, ``}},
+	{`ab${A}c`, `abdc`, &map[string]string{}, &map[string]string{"A": "d"}},
 }
 
 func TestRead(t *testing.T) {

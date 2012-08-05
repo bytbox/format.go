@@ -30,7 +30,7 @@ func (rp rawPart) Match(input string) bool {
 }
 
 func (rp rawPart) Read(input string, data interface{}, next FormatPart) (string, error) {
-	if input[:len(rp.data)] != rp.data {
+	if len(input) < len(rp.data) || input[:len(rp.data)] != rp.data {
 		return "", errors.New("Read failed (expected raw data not found)")
 	}
 	return input[len(rp.data):], nil
@@ -63,8 +63,15 @@ func (fp fieldPart) Read(input string, data interface{}, next FormatPart) (strin
 		}
 	}
 	dv := reflect.Indirect(reflect.ValueOf(data))
-	dv.FieldByName(fp.name).SetString(input[:i])
-	return input[i:], nil
+	switch dv.Type().Kind() {
+	case reflect.Struct:
+		dv.FieldByName(fp.name).SetString(input[:i])
+		return input[i:], nil
+	case reflect.Map:
+		dv.SetMapIndex(reflect.ValueOf(fp.name), reflect.ValueOf(input[:i]))
+		return input[i:], nil
+	}
+	panic("unknown type passed to Write()")
 }
 
 type terminalPart struct{}
